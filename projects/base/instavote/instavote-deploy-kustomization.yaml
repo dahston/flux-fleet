@@ -8,6 +8,7 @@ spec:
   interval: 1m0s
   path: ./flux/staging
   prune: false
+  targetNamespace: instavote
   serviceAccountName: instavote
   sourceRef:
     kind: GitRepository
