@@ -1,47 +1,37 @@
-The create tenant command generates namespaces, service accounts and role bindings to limit the
-reconcilers scope to the tenant namespaces.
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    toolkit.fluxcd.io/tenant: instavote
+  name: instavote
 
-Usage:
-  flux create tenant [flags]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    toolkit.fluxcd.io/tenant: instavote
+  name: instavote
+  namespace: instavote
 
-Examples:
-  # Create a tenant with access to a namespace 
-  flux create tenant dev-team \
-    --with-namespace=frontend \
-    --label=environment=dev
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    toolkit.fluxcd.io/tenant: instavote
+  name: instavote-reconciler
+  namespace: instavote
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: gotk:instavote:reconciler
+- kind: ServiceAccount
+  name: instavote
+  namespace: instavote
 
-  # Generate tenant namespaces and role bindings in YAML format
-  flux create tenant dev-team \
-    --with-namespace=frontend \
-    --with-namespace=backend \
-	--export > dev-team.yaml
-
-Flags:
-      --cluster-role string      cluster role of the tenant role binding (default "cluster-admin")
-  -h, --help                     help for tenant
-      --with-namespace strings   namespace belonging to this tenant
-
-Global Flags:
-      --as string                      Username to impersonate for the operation. User could be a regular user or a service account in a namespace.
-      --as-group stringArray           Group to impersonate for the operation, this flag can be repeated to specify multiple groups.
-      --as-uid string                  UID to impersonate for the operation.
-      --cache-dir string               Default cache directory (default "/home/danieldwan/.kube/cache")
-      --certificate-authority string   Path to a cert file for the certificate authority
-      --client-certificate string      Path to a client certificate file for TLS
-      --client-key string              Path to a client key file for TLS
-      --cluster string                 The name of the kubeconfig cluster to use
-      --context string                 The name of the kubeconfig context to use
-      --export                         export in YAML format to stdout
-      --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
-      --interval duration              source sync interval (default 1m0s)
-      --kube-api-burst int             The maximum burst queries-per-second of requests sent to the Kubernetes API. (default 100)
-      --kube-api-qps float32           The maximum queries-per-second of requests sent to the Kubernetes API. (default 50)
-      --kubeconfig string              Path to the kubeconfig file to use for CLI requests.
-      --label strings                  set labels on the resource (can specify multiple labels with commas: label1=value1,label2=value2)
-  -n, --namespace string               If present, the namespace scope for this CLI request (default "flux-system")
-      --server string                  The address and port of the Kubernetes API server
-      --timeout duration               timeout for this operation (default 5m0s)
-      --tls-server-name string         Server name to use for server certificate validation. If it is not provided, the hostname used to contact the server is used
-      --token string                   Bearer token for authentication to the API server
-      --user string                    The name of the kubeconfig user to use
-      --verbose                        print generated objects
