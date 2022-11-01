@@ -7,6 +7,6 @@ metadata:
 spec:
   interval: 1m0s
   ref:
-    branch: main
-  url: https://githum.com/dahston/instavote-deploy
+    branch: master
+  url: https://github.com/dahston/instavote-deploy
 
